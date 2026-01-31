@@ -1,0 +1,68 @@
+@extends('admin.layout.app')    <!-- контент из app.blade.php -->
+
+@section('title', 'Редактирование поста')
+
+@section('content')
+    <!-- Заголовок страницы -->
+    <h1 class="text-xl font-bold">Редактирование поста</h1>
+
+
+    <form class="glass rounded-2xl p-6 border border-white/10 space-y-5 flex flex-col gap-3" action="{{ route('posts.update', $post->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+        <div class="flex flex-col">
+            <label class="label mb-2 text-gray-300">Заголовок</label>
+            <input
+                type="text"
+                class="input border border-white/10 px-3 py-2 rounded-xl"
+                placeholder="Название поста"
+                name="title"
+                value="{{ old('title', $post->title) }}">
+            @error('title') <p class="text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+{{--        <div class="flex flex-col">--}}
+{{--            <label class="label">Ссылка</label>--}}
+{{--            <input--}}
+{{--                type="text"--}}
+{{--                class="input border border-white/10 px-3 py-2 rounded-xl"--}}
+{{--                placeholder="Название поста"--}}
+{{--                name="slug"--}}
+{{--                value="{{ old('title', $post->slug) }}">--}}
+{{--        </div>--}}
+
+        <div class="flex flex-col">
+            <label class="label mb-2 text-gray-300">Краткое описание</label>
+            <textarea
+                class="input border border-white/10 px-3 py-2 rounded-xl"
+                rows="3"
+                placeholder="Текст для списка постов..."
+                name="excerpt"
+            >{{ old('excerpt', $post->excerpt) }}</textarea>
+            @error('excerpt') <p class="text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="flex flex-col">
+            <label class="label mb-2 text-gray-300">Текст</label>
+            <textarea
+                class="input border border-white/10 px-3 py-2 rounded-xl"
+                rows="10"
+                placeholder="Основной контент..."
+                name="body"
+            >{{ old('body', $post->body) }}</textarea>
+            @error('body') <p class="text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div class="flex flex-col">
+                <label class="label mb-2 text-gray-300">Статус</label>
+                <input type="checkbox" name="is_published" {{ old('is_published', $post->is_published ?? false) ? 'checked' : '' }}>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4">
+            <a href="{{ route('posts.index') }}" class="btn btn-outline cursor-pointer">Отмена</a>
+            <button type="submit" class="btn btn-primary px-4 py-2 cursor-pointer rounded-xl">Обновить</button>
+        </div>
+    </form>
+@endsection
