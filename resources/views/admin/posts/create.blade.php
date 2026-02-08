@@ -7,7 +7,7 @@
     <h1 class="text-xl font-bold">Новый пост</h1>
 
 
-    <form class="glass rounded-2xl p-6 border border-white/10 space-y-5 flex flex-col gap-3" action="{{ route('posts.store') }}" method="POST">
+    <form class="glass rounded-2xl p-6 border border-white/10 space-y-5 flex flex-col gap-3" action="{{ route('admin.posts.store') }}" method="POST">
         @csrf
         <div class="flex flex-col">
             <label class="label mb-2 text-gray-300">Заголовок</label>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-4">
-            <a href="{{ route('posts.index') }}" class="btn btn-outline cursor-pointer">Отмена</a>
+            <a href="{{ route('admin.posts.index') }}" class="btn btn-outline cursor-pointer">Отмена</a>
             <button type="submit" class="btn btn-primary px-4 py-2 cursor-pointer rounded-xl">Создать</button>
         </div>
     </form>

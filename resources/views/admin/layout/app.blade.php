@@ -6,7 +6,8 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'Laravel 12 blog from zero')</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+{{--    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>--}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .accent{background-image: linear-gradient(135deg, #22d3ee, #a78bfa, #f472b6)}
         .glass {background: rgba(17, 24, 39, .7);backdrop-filter:blur(12px)}
