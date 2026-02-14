@@ -40,7 +40,7 @@
                 </svg>
             </button>
 
-            <a href="#" class="flex items-center gap-2">
+            <a href="{{ route('admin.posts.index') }}" class="flex items-center gap-2">
                 <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl accent text-gray-900 font-black">
                     А
                 </span>
@@ -70,7 +70,7 @@
 
             <!-- Ссылка "Посты" (активная) -->
             <a
-                href="#posts-list.html"
+                href="{{ route('admin.posts.index') }}"
                 class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-white bg-white/5"
             >
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
