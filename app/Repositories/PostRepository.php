@@ -59,8 +59,30 @@ class PostRepository implements PostRepositoryInterface // наследован�
         return $post;
     }
 
-    public function deleteApi(Post $post): bool
+    public function softDelete(Post $post): bool
     {
         return $post->delete();
+    }
+
+    public function restore(int $id): ?Post
+    {
+        $post = Post::onlyTrashed()->find($id);
+        if (!$post) return null;
+
+        $post->restore();
+        return $post;
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $post = Post::find($id);
+        if (!$post) return false;
+
+        return $post->forceDelete();
+    }
+
+    public function getTrashed(): Collection
+    {
+        return Post::onlyTrashed()->get();
     }
 }

@@ -18,5 +18,8 @@ Route::prefix('auth')->group(function (): void {
 //Route::get('posts/{id}', [PostController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/posts/trashed', [PostController::class, 'trashed']);
     Route::apiResource('posts', PostController::class)->except('create', 'edit');   // исключаем методы create и edit т.к. их нет в PostController
+    Route::post('/posts/{id}/restore', [PostController::class, 'restore']);
+    Route::delete('/posts/{id}/force', [PostController::class, 'forceDelete']);
 });

@@ -26,7 +26,13 @@ class PostController extends Controller
         $posts = $this->postService->getAllApi();
 
         return new PostCollection($posts);
+    }
 
+    public function trashed(): PostCollection
+    {
+        $posts = $this->postService->getTrashed();
+
+        return new PostCollection($posts);
     }
 
     public function show(int $id): PostResource | JsonResponse
@@ -67,10 +73,32 @@ class PostController extends Controller
 
         Gate::authorize('update', $post);
 
-        $deleted = $this->postService->deleteApi($id);
+        $deleted = $this->postService->softDeleteApi($id);
 
         if (!$deleted) return response()->json(['message' => 'Not Found'], 404);
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $result = $this->postService->restoreApi($id);
+
+        if (!$result) {
+            return response()->json(['success' => false, 'message' => 'Not Found'], 404);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function forceDelete(int $id): JsonResponse
+    {
+        $deleted = $this->postService->forceDeleteApi($id);
+
+        if (!$deleted) {
+            return response()->json(['success' => false, 'message' => 'Not Found'], 404);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

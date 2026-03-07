@@ -20,5 +20,8 @@ interface PostRepositoryInterface
     public function findApi(int $id): ?Post;
     public function createApi(array $data): Post;
     public function updateApi(Post $post, array $data): Post;
-    public function deleteApi(Post $post): bool;
+    public function softDelete(Post $post): bool;
+    public function restore(int $id): ?Post;
+    public function forceDelete(int $id): bool;
+    public function getTrashed(): Collection;
 }
