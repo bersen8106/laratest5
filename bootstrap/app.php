@@ -1,12 +1,15 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Http\Middleware\RequestIdMiddleware;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -19,10 +22,34 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class
+            'role' => RoleMiddleware::class
         ]);
+        $middleware->append(RequestIdMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+// РЕПОРТ ОШИБОК:
+        $exceptions->report(function (ApiException $e): bool {
+            if ($e->status >= 400 && $e->status < 500) {    // Не логируем эти ошибки (от 400 до 500)
+                return false;
+            }
+
+            Log::error('ApiException', [
+                'message' => $e->getMessage(),
+                'status' => $e->status,
+                'errors' => $e->errors,
+            ]);
+            return true;
+        });
+
+        $exceptions->report(function (Throwable $e): bool {
+            Log::error('Unhandled exception', [
+                'type' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
+            return true;
+        });
+
+// ОТЛОВ РАЗЛИЧНЫХ ОШИБОК:
         $exceptions->render(function (ApiException $e) {    // Главный обработчик. Перехватывает наши ошибки
             return response()->json([
                'success' => false,
@@ -30,7 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'errors' => $e->errors,
             ], $e->status);
         });
-// ОТЛОВ РАЗЛИЧНЫХ ОШИБОК:
+
         $exceptions->render(function (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
