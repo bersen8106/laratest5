@@ -1,8 +1,14 @@
 <?php
 
+use App\Exceptions\ApiException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,5 +23,47 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (ApiException $e) {    // Главный обработчик. Перехватывает наши ошибки
+            return response()->json([
+               'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors,
+            ], $e->status);
+        });
+// ОТЛОВ РАЗЛИЧНЫХ ОШИБОК:
+        $exceptions->render(function (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Resource not found',
+            ]);
+        });
+
+        $exceptions->render(function (AuthorizationException $e) {  // когда Polices запрещают действие - API получает красивую ошибку
+            return response()->json([
+               'success' => false,
+               'message' => $e->getMessage() ?: 'Forbidden',
+            ], 403);
+        });
+
+        $exceptions->render(function (AuthenticationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        });
+
+        $exceptions->render(function (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        });
+// ВСЕ ОСТАЛЬНЫЕ ОШИБКИ:
+        $exceptions->render(function (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        });
     })->create();
