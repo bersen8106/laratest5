@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\PostController;
 
 Route::prefix('auth')->group(function (): void {
     Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:login');
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('me', [AuthController::class, 'me']);
@@ -17,7 +17,7 @@ Route::prefix('auth')->group(function (): void {
 //Route::get('posts', [PostController::class, 'index']);
 //Route::get('posts/{id}', [PostController::class, 'show']);
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::get('/posts/trashed', [PostController::class, 'trashed']);
     Route::apiResource('posts', PostController::class)->except('create', 'edit');   // исключаем методы create и edit т.к. их нет в PostController
     Route::post('/posts/{id}/restore', [PostController::class, 'restore']);
